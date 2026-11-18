@@ -1,0 +1,478 @@
+ChatGPT said:
+Bilkul bhai. Ab main har cheez ka 3-part answer dunga:
+
+Kya hai?
+Kyun use kiya?
+Interview mein kaise bolna hai?
+Tera jo Infinite Scroll code hai, usi ke context mein samajh. 👇
+
+1. useState kya karta hai?
+const [data, setData] = useState([]);
+
+Kya hai?
+useState React ka hook hai jo changing data ko store karta hai.
+
+Kyun use kiya?
+Kyuki data aur pageno time ke saath change hote hain aur unke change hone par React ko component re-render karna hai.
+
+Example:
+
+data:
+[] → [dog1,dog2,dog3] → [dog1...dog6]
+
+pageno:
+1 → 2 → 3
+
+Agar normal variable hota:
+
+let pageno = 1;
+
+toh React ko properly state update ka signal nahi milta.
+
+Interview answer:
+"useState is used to store data that can change over time and to trigger a re-render when that state changes."
+
+2. data state kyun hai?
+const [data, setData] = useState([]);
+
+Kya hai?
+data ke andar API se aaye saare dog images store hain.
+
+Kyun use kiya?
+Kyuki har API call ke baad naye dogs add honge aur humein purane dogs bhi screen par rakhne hain.
+
+Example:
+
+Page 1 → 🐶 🐶 🐶
+
+Page 2 → 🐶 🐶 🐶
+
+Final data:
+🐶 🐶 🐶 🐶 🐶 🐶
+
+Interview answer:
+"data is stored in state because the API response changes over time, and whenever new data arrives, I want React to re-render the images."
+
+3. pageno state kyun hai?
+const [pageno, setPageNo] = useState(1);
+
+Kya hai?
+Current API page number.
+
+Starting:
+
+pageno = 1
+
+Then:
+
+1 → 2 → 3 → 4
+
+Kyun use kiya?
+Kyuki jab last image screen pe aaye, humein next page request karni hai.
+
+setPageNo((pageno) => pageno + 1);
+
+Page change hoga:
+
+1 → 2
+
+Aur [pageno] ki wajah se API call dobara hogi.
+
+Interview answer:
+"pageno stores the current page number. I keep it in state because changing the page number should trigger the API call for the next page."
+
+4. Props kya hain?
+Example:
+
+<Post data={data} setPageNo={setPageNo} />
+
+Kya hai?
+Props = parent component se child component ko data/function bhejne ka tarika.
+
+Yahan:
+
+InfiniteScroll
+      ↓
+     Post
+
+Parent → Child.
+
+Kyun use kiya?
+Post ko parent ka data aur setPageNo chahiye.
+
+Interview answer:
+"Props are used to pass data or functions from a parent component to a child component."
+
+5. data={data} kyun bheja?
+<Post data={data} />
+
+Left side:
+data
+
+Prop ka naam.
+
+Right side:
+data
+
+Parent ka actual state.
+
+Kyun?
+Post ko images render karni hain:
+
+data.map(...)
+
+Isliye parent ka data Post ko diya.
+
+Interview answer:
+"I pass data as a prop because the Post component is responsible for rendering the images, and the image data is maintained in the parent component."
+
+6. setPageNo={setPageNo} kyun bheja?
+<Post setPageNo={setPageNo} />
+
+Kya?
+Parent ka state-update function child ko de rahe hain.
+
+Kyun?
+Last image ko Post component observe kar raha hai.
+
+Jab last image visible hogi:
+
+setPageNo((pageno) => pageno + 1);
+
+Post parent ka page number badha dega.
+
+Flow:
+Post
+ ↓
+Last image visible
+ ↓
+setPageNo()
+ ↓
+Parent ka pageno change
+ ↓
+useEffect
+ ↓
+API call
+
+Interview answer:
+"I pass setPageNo to the child because the child detects when the last image becomes visible, but the page state belongs to the parent. So the child needs the parent's state updater to request the next page."
+
+Ye answer interview mein kaafi strong hai. 🔥
+
+7. useEffect ka [pageno] wala kaam
+useEffect(() => {
+   fetch(...);
+}, [pageno]);
+
+Kya?
+useEffect side effects perform karne ke liye use hota hai.
+
+Yahan side effect = API call.
+
+[pageno] kyun?
+Matlab:
+
+Jab pageno change ho, effect dobara chalao.
+
+Example:
+
+pageno = 1
+ ↓
+API page 1
+
+pageno = 2
+ ↓
+API page 2
+
+pageno = 3
+ ↓
+API page 3
+
+Interview answer:
+"I added pageno to the dependency array so that whenever the page number changes, the effect runs again and fetches the next page."
+
+8. fetch() kya karta hai?
+fetch(`https://api.thedogapi.com/...`)
+
+Kya?
+fetch() server/API ko HTTP request bhejne ke liye use hota hai.
+
+Kyun?
+Humein Dog API se images ka data chahiye.
+
+React
+ ↓
+fetch()
+ ↓
+Dog API
+ ↓
+Response
+
+Interview answer:
+"fetch is used to make an HTTP request to the API and retrieve the dog image data."
+
+9. .then() ka flow
+fetch(URL)
+  .then((res) => {
+    return res.json();
+  })
+  .then((arr) => {
+    setData(...);
+  });
+
+.then() kya hai?
+.then() bolta hai:
+
+"Pehla kaam complete hone ke baad, ab ye kaam kar."
+
+fetch() asynchronous hai.
+
+Matlab API ka response aane mein time lagta hai.
+
+Toh:
+
+fetch()
+.then(...)
+
+means:
+
+"Fetch complete ho jaaye → phir .then() chala."
+
+Tere code mein:
+fetch()
+ ↓
+response
+ ↓
+.then()
+ ↓
+json data
+ ↓
+.then()
+ ↓
+setData()
+
+Interview answer:
+"I use .then() to handle the result of the asynchronous fetch operation. The first .then() converts the response into JSON, and the second .then() updates the state with that data."
+
+10. res.json() kya karta hai?
+.then((res) => {
+  return res.json();
+})
+
+res kya hai?
+res = API ka response.
+
+res.json() kya karta hai?
+Response body ko JSON se JavaScript object/array mein parse karta hai.
+
+Example:
+
+API response
+      ↓
+    res
+      ↓
+ res.json()
+      ↓
+JavaScript data
+
+Kyun?
+Taaki hum API ke data ko JavaScript mein use kar sakein.
+
+Interview answer:
+"res is the HTTP response returned by fetch. res.json() parses the response body and converts the JSON data into a JavaScript object or array that I can work with."
+
+11. setData((olddata) => [...olddata, ...arr])
+Ye bahut important hai.
+
+setData((olddata) => [...olddata, ...arr]);
+
+arr kya hai?
+API se naya data.
+
+Example:
+
+arr = [🐶4, 🐶5, 🐶6]
+
+olddata kya hai?
+State mein already pada purana data.
+
+olddata = [🐶1, 🐶2, 🐶3]
+
+Spread kya kar raha?
+[...olddata, ...arr]
+
+Result:
+
+[🐶1, 🐶2, 🐶3, 🐶4, 🐶5, 🐶6]
+
+Kyun?
+Infinite scroll mein purana data delete nahi karna, naye data ko purane ke saath append karna hai.
+
+Interview answer:
+"I use the functional state update because I need the latest previous state. I spread the old data and append the new API results, so previously loaded images remain on the page."
+
+12. IntersectionObserver kya karta hai?
+const observer = new IntersectionObserver(...)
+
+Kya?
+Browser ka API hai jo check karta hai ki koi element viewport mein visible hua ya nahi.
+
+Kyun?
+Infinite scroll mein humein ye pata karna hai:
+
+"Last image screen pe aa gayi kya?"
+
+Agar aa gayi → next page load.
+
+Interview answer:
+"I use IntersectionObserver to detect when the last image enters the viewport, which allows me to load the next page without listening to scroll events manually."
+
+Ye bahut accha interview point hai.
+
+13. isIntersecting kya hai?
+if (param[0].isIntersecting) {
+
+Kya?
+Ye boolean value hai:
+
+true  → element viewport mein hai
+false → element viewport mein nahi hai
+
+Kyun?
+Humein check karna hai:
+
+"Last image visible hui ya nahi?"
+
+Agar:
+
+isIntersecting === true
+
+toh:
+
+setPageNo(...)
+
+chal jayega.
+
+Interview answer:
+"isIntersecting tells me whether the observed element is currently intersecting with the viewport. I use it to know when the last image becomes visible."
+
+14. threshold: 1 kyun?
+{
+  threshold: 1
+}
+
+Kya?
+Observer ko batata hai ki element kitna visible hone par callback trigger karna hai.
+
+0   = 0% visible
+0.5 = 50% visible
+1   = 100% visible
+
+Tere code mein:
+threshold: 1
+
+Matlab:
+
+Element 100% visible hone par callback trigger karo.
+
+Interview answer:
+"I use a threshold of 1 because I want the observer callback when the last image is fully visible."
+
+15. observer.observe(lastPost) kya karta hai?
+observer.observe(lastPost);
+
+Kya?
+Observer ko bolta hai:
+
+"Is particular element ko watch karo."
+
+Yahan:
+
+lastPost
+
+last image hai.
+
+Kyun?
+Humein sirf last image ko watch karna hai.
+
+Dog 1
+Dog 2
+Dog 3 ← 👀 only this one
+
+Jab Dog 3 visible:
+
+isIntersecting = true
+
+→ next page.
+
+Interview answer:
+"observer.observe(lastPost) starts observing the last image so I can detect when it enters the viewport."
+
+16. observer.disconnect() kyun?
+return () => observer.disconnect();
+
+Kya?
+Observer ko completely stop karta hai.
+
+Kyun?
+Tera data change hone par effect dobara chalega:
+
+}, [data]);
+
+Purana observer unnecessarily active nahi rehna chahiye.
+
+Isliye cleanup:
+
+Purana observer
+      ↓
+disconnect()
+      ↓
+band
+      ↓
+naya observer
+      ↓
+new last image observe
+
+Interview answer:
+"I disconnect the observer in the cleanup function to prevent old observers from remaining active after the component updates or unmounts. This helps avoid unnecessary callbacks and resource leaks."
+
+🔥 Ab interviewer agar poora code explain karne bole
+Tu ye flow bol sakta hai:
+
+"I have two states: data stores all fetched images and pageno stores the current API page. Whenever pageno changes, useEffect calls the API. I convert the response using res.json() and append the new images to the existing data using a functional state update. I pass both data and setPageNo to the Post component through props. In Post, I use IntersectionObserver to observe the last image. When the last image becomes fully visible, isIntersecting becomes true, so I increment the page number. This triggers the API effect again and loads the next set of images. I also disconnect the observer during cleanup."
+
+Bhai, agar tu ye flow apni language mein confidently explain kar de, toh interviewer ko clear dikhega ki tune code ratta nahi maara, concept samjha hai. 🔥
+
+Sabse important chain yaad kar:
+useState
+   ↓
+data + pageno
+
+pageno change
+   ↓
+useEffect
+   ↓
+fetch API
+   ↓
+res.json()
+   ↓
+new arr
+   ↓
+setData(olddata + arr)
+   ↓
+new images
+   ↓
+IntersectionObserver
+   ↓
+last image visible
+   ↓
+setPageNo(+1)
+   ↓
+pageno change
+   ↓
+useEffect again 🔄
+
+Bas is chain ko dimaag mein bitha le bhai — poora project samajh aa jayega.
+
+
+
